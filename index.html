@@ -200,23 +200,71 @@ progress-ring{color:var(--text3)}
 
 <!-- ── Nav ───────────────────────────────────────────────────────────── -->
 <div id="nav">
-  <div class="nav-tab active" data-page="bank"><div class="dot"></div>BankInnsikt</div>
+  <div class="nav-tab active" data-page="command"><div class="dot"></div>Command Center</div>
+  <div class="nav-tab" data-page="bank"><div class="dot"></div>BankInnsikt</div>
   <div class="nav-tab" data-page="sector"><div class="dot"></div>Sektoranalyse</div>
   <div class="nav-tab" data-page="segment"><div class="dot"></div>Segmentanalyse</div>
   <div class="nav-tab" data-page="screening"><div class="dot"></div>Screening</div>
   <div class="nav-tab" data-page="ranking"><div class="dot"></div>Ranking</div>
+  <div class="nav-tab" data-page="rate"><div class="dot"></div>Renteeksponering</div>
   <div class="nav-tab" data-page="scenario"><div class="dot"></div>Scenario</div>
   <div class="nav-tab" data-page="regression"><div class="dot"></div>Regresjon</div>
   <div class="nav-tab" data-page="montecarlo"><div class="dot"></div>Monte Carlo</div>
   <div class="nav-tab" data-page="market"><div class="dot"></div>Markedsandeler</div>
   <div class="nav-tab" data-page="compare"><div class="dot"></div>Sammenligning</div>
+  <div class="nav-tab" data-page="dataquality"><div class="dot"></div>Data Quality</div>
 </div>
 
 <!-- ── Main content ─────────────────────────────────────────────────── -->
 <div id="main">
 
+<!-- ══ COMMAND CENTER (Market Pulse) ═══════════════════════════════════════ -->
+<div class="page active" id="page-command">
+  <div style="padding:14px 14px 4px 14px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px">
+    <div>
+      <div style="font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.3px">Market Pulse</div>
+      <div style="font-size:11px;color:var(--text3)" id="cmd-subtitle">–</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);font-family:var(--mono)">
+      <span id="cmd-data-meta">–</span>
+    </div>
+  </div>
+
+  <!-- Pulse cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;padding:10px 14px" id="cmd-pulse-cards"></div>
+
+  <!-- Sektorgrafer 2x2 -->
+  <div class="chart-grid grid-2" style="margin:6px 12px">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">NIM utvikling (median) – med spread (P25–P75)</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-cmd-nim" style="min-height:260px"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">ROE utvikling (median) – med spread (P25–P75)</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-cmd-roe" style="min-height:260px"></div></div>
+    </div>
+  </div>
+
+  <div class="chart-grid grid-2" style="margin:0 12px">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Bredde-indikator – andel banker med fallende NIM (YoY)</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-cmd-breadth" style="min-height:240px"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">YoY-bevegelser siste år – største vinnere/tapere på NIM</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-cmd-movers" style="min-height:240px"></div></div>
+    </div>
+  </div>
+
+  <!-- Insights -->
+  <div class="panel" style="margin:12px">
+    <div class="panel-hdr"><span class="panel-title">Sektorobservasjoner – generert fra siste tilgjengelige data</span></div>
+    <div class="panel-body"><div id="cmd-insights"></div></div>
+  </div>
+</div>
+
 <!-- ══ 1. BANK DASHBOARD ══════════════════════════════════════════════════ -->
-<div class="page active" id="page-bank">
+<div class="page" id="page-bank">
   <div class="ctrl-bar">
     <div class="ctrl-group">
       <span class="ctrl-label">Bank</span>
@@ -770,6 +818,118 @@ progress-ring{color:var(--text3)}
   <div class="panel" style="margin:12px">
     <div class="panel-hdr"><span class="panel-title">Markedsandelstabell</span></div>
     <div class="panel-body tbl-wrap"><div id="mkt-table"></div></div>
+  </div>
+</div>
+
+<!-- ══ RENTEEKSPONERING ════════════════════════════════════════════════════ -->
+<div class="page" id="page-rate">
+  <div style="padding:14px 14px 4px 14px">
+    <div style="font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.3px">Renteeksponering</div>
+    <div style="font-size:11px;color:var(--text3)">NIM- og ROE-følsomhet til styringsrenten – estimert OLS-beta basert på bank-år-observasjoner 2015–2025. Beta tolkes som basispunkter per 1 prosentpoeng styringsrente.</div>
+  </div>
+
+  <div class="ctrl-bar" style="margin-top:8px">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Variabel</span>
+      <select id="rate-metric">
+        <option value="nim">NIM</option>
+        <option value="roe">ROE</option>
+        <option value="cost_ratio">Kostnadsprosent</option>
+        <option value="loss_rate">Tapsprosent</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Segment</span>
+      <select id="rate-segment">
+        <option value="all">Alle</option><option value="small">Små</option><option value="medium">Medium</option><option value="large">Store</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Minimum obs. per bank</span>
+      <select id="rate-minobs"><option value="3">3</option><option value="5" selected>5</option><option value="7">7</option></select>
+    </div>
+    <button class="btn btn-primary" id="run-rate">▶ Beregn</button>
+    <button class="btn" id="rate-export" style="margin-left:auto">⬇ Excel</button>
+  </div>
+
+  <div class="kpi-row kpi-4" id="rate-kpis" style="margin:8px 12px"></div>
+
+  <div class="chart-grid grid-2" style="margin:0 12px">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Beta-ranking – mest rentesensitive banker (positive)</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-rate-pos" style="min-height:320px"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Beta-ranking – minst rentesensitive / negative beta</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-rate-neg" style="min-height:320px"></div></div>
+    </div>
+  </div>
+
+  <div class="chart-grid grid-2" style="margin:0 12px">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Beta-fordeling – histogram</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-rate-hist" style="min-height:240px"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Segmenter sammenlignet – median beta</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-rate-seg" style="min-height:240px"></div></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin:12px">
+    <div class="panel-hdr"><span class="panel-title">Beta-tabell – alle banker</span></div>
+    <div class="panel-body tbl-wrap"><div id="rate-table"></div></div>
+  </div>
+</div>
+
+<!-- ══ DATA QUALITY ════════════════════════════════════════════════════════ -->
+<div class="page" id="page-dataquality">
+  <div style="padding:14px 14px 4px 14px">
+    <div style="font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.3px">Data Quality</div>
+    <div style="font-size:11px;color:var(--text3)">Datadekning, kilde og siste oppdatering per nøkkeltall og bank.</div>
+  </div>
+  <div class="kpi-row kpi-4" id="dq-kpis" style="margin:8px 12px"></div>
+  <div class="chart-grid grid-2" style="margin:0 12px">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Dekning per nøkkeltall og år</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-dq-coverage" style="min-height:380px"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">Antall banker per år</span></div>
+      <div class="panel-body"><div class="chart-wrap" id="chart-dq-banks" style="min-height:380px"></div></div>
+    </div>
+  </div>
+  <div class="panel" style="margin:12px">
+    <div class="panel-hdr"><span class="panel-title">Datakilder og metode</span></div>
+    <div class="panel-body" style="font-size:13px;line-height:1.7;color:var(--text1);padding:14px 18px">
+      <p style="margin:0 0 10px"><b>Kilder:</b></p>
+      <ul style="margin:0 0 14px 18px;padding:0">
+        <li><b>2015–2023:</b> Finanstilsynet, «Sparebankenes årsregnskaper» (Tab1 = inntekt/kostnad, Tab2 = balanse, Tab3 = nøkkeltall)</li>
+        <li><b>2024–2025:</b> Finanstilsynet, «Regnskapstall for norske banker – analytikerrapport»</li>
+        <li><b>Styringsrente:</b> Norges Bank, månedlig historikk skrapet fra <code>norges-bank.no</code>, aggregert til årsgjennomsnitt</li>
+      </ul>
+      <p style="margin:0 0 8px"><b>Metode for avledede tall:</b></p>
+      <ul style="margin:0 0 14px 18px;padding:0">
+        <li><b>NIM</b> = netto renteinntekter / forvaltningskapital</li>
+        <li><b>ROE</b> = resultat før skatt / egenkapital (ikke etter skatt – konsistent med Finanstilsynets oppsett)</li>
+        <li><b>Kostnadsprosent</b> = sum driftskostnader / sum driftsinntekter</li>
+        <li><b>Innskuddsdekning</b> = innskudd / brutto utlån</li>
+        <li><b>Tapsprosent</b> = kredittap på utlån / brutto utlån (tilgjengelig for 2024–2025)</li>
+        <li><b>Utlånsvekst</b> = (brutto utlån<sub>t</sub> − brutto utlån<sub>t−1</sub>) / brutto utlån<sub>t−1</sub></li>
+        <li><b>Segment</b>: små = FK &lt; 5 mrd NOK, medium = 5–30 mrd, store = &gt; 30 mrd</li>
+      </ul>
+      <p style="margin:0 0 8px"><b>Kjente begrensninger:</b></p>
+      <ul style="margin:0 0 0 18px;padding:0">
+        <li>Tapsprosent for 2015–2023 og 2025 er ikke ekstrahert (label-mismatch i kildefiler) – vist som «–»</li>
+        <li>Markedsandeler dekker kun banker i datasettet (DNB og utenlandske filialer er ekskludert i sparebankuniverset)</li>
+        <li>Bankene grupperes etter siste tilgjengelige navn – tidligere navn (f.eks. «SpareBank 1» med stor B) er normalisert</li>
+        <li>Ingen kvartalsdata – analysen er årlig</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel" style="margin:12px">
+    <div class="panel-hdr"><span class="panel-title">Banker med ufullstendig data</span></div>
+    <div class="panel-body tbl-wrap"><div id="dq-incomplete"></div></div>
   </div>
 </div>
 
@@ -2978,6 +3138,528 @@ function addGlobalExportButtons() {
     if (hdr) hdr.appendChild(btn);
   };
   exportBtn('bank-hist-tbl', 'norbank_bank_historikk');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMMAND CENTER / MARKET PULSE
+// ═══════════════════════════════════════════════════════════════════════════
+function initCommandCenter() {
+  renderCommandCenter();
+}
+
+function pct(v, dec=2) { return v != null && isFinite(v) ? (v*100).toFixed(dec) + '%' : '–'; }
+function bp(v, dec=0) { return v != null && isFinite(v) ? (v*10000).toFixed(dec) + ' bp' : '–'; }
+function percentile(vals, target) {
+  if (!vals.length) return null;
+  const sorted = vals.slice().sort((a,b)=>a-b);
+  const below = sorted.filter(v => v < target).length;
+  return below / sorted.length * 100;
+}
+
+function renderCommandCenter() {
+  const years = allYears();
+  if (!years.length) return;
+  const lastYr = years[years.length-1];
+  const prevYr = lastYr - 1;
+  document.getElementById('cmd-subtitle').textContent =
+    `${STATE.banks.length.toLocaleString('nb-NO')} bank-år, ${allBanks().length} unike banker, ${years[0]}–${lastYr}.`;
+  document.getElementById('cmd-data-meta').textContent =
+    `Univers: ${STATE.universe === 'sparebanker' ? 'sparebanker' : 'alle banker'}`;
+
+  // Compute pulse cards
+  const lastRows = STATE.banks.filter(r => r.year === lastYr);
+  const prevRows = STATE.banks.filter(r => r.year === prevYr);
+
+  const med = (arr, key) => {
+    const v = arr.map(r => getMetricVal(r, key)).filter(x => x != null && isFinite(x)).sort((a,b)=>a-b);
+    return v.length ? v[Math.floor(v.length/2)] : null;
+  };
+  const wmean = (arr, key, weight='total_assets') => {
+    const pairs = arr.filter(r => r[key]!=null && r[weight]>0);
+    if (!pairs.length) return null;
+    const ws = pairs.reduce((s,r)=>s + r[weight], 0);
+    return pairs.reduce((s,r)=>s + getMetricVal(r,key)*r[weight], 0) / ws;
+  };
+
+  const nimMed = med(lastRows, 'nim');
+  const nimMedPrev = med(prevRows, 'nim');
+  const roeMed = med(lastRows, 'roe');
+  const roeMedPrev = med(prevRows, 'roe');
+  const costMed = med(lastRows, 'cost_ratio');
+  const costMedPrev = med(prevRows, 'cost_ratio');
+  const cet1Med = med(lastRows, 'cet1');
+  const cet1MedPrev = med(prevRows, 'cet1');
+  const depMed = med(lastRows, 'deposit_coverage');
+  const depMedPrev = med(prevRows, 'deposit_coverage');
+  const lgMed = med(lastRows, 'loan_growth');
+  const lgMedPrev = med(prevRows, 'loan_growth');
+
+  // Rate sensitivity for sector
+  const ratePairs = STATE.banks.filter(r => r.nim != null && r.policy_rate != null);
+  let nimBeta = null;
+  if (ratePairs.length > 10) {
+    const xs = ratePairs.map(r => r.policy_rate);
+    const ys = ratePairs.map(r => r.nim);
+    const n = xs.length;
+    const xb = xs.reduce((a,b)=>a+b,0)/n, yb = ys.reduce((a,b)=>a+b,0)/n;
+    const Sxx = xs.reduce((s,x)=>s+(x-xb)**2,0);
+    const Sxy = xs.reduce((s,x,i)=>s+(x-xb)*(ys[i]-yb),0);
+    nimBeta = Sxx ? Sxy/Sxx : null;
+  }
+
+  const card = (label, val, change, sub, cls) => `
+    <div class="kpi-card" style="position:relative">
+      <div class="kpi-label">${label}</div>
+      <div class="kpi-value" style="margin-top:4px">${val}</div>
+      <div class="kpi-delta ${cls||''}" style="font-size:11px;margin-top:2px">${change || ''}</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px;line-height:1.45">${sub}</div>
+    </div>`;
+
+  const deltaFmt = (cur, prev, scale=10000, unit='bp') => {
+    if (cur == null || prev == null) return { txt: '', cls: '' };
+    const d = (cur - prev) * scale;
+    const sign = d >= 0 ? '+' : '';
+    return { txt: `${sign}${d.toFixed(unit==='pp'?1:0)} ${unit} YoY`, cls: d >= 0 ? 'td-pos' : 'td-neg' };
+  };
+
+  const cards = [];
+  const dN = deltaFmt(nimMed, nimMedPrev);
+  cards.push(card('Margin pressure (NIM)', pct(nimMed),
+    dN.txt,
+    nimMed != null && nimMedPrev != null
+      ? (nimMed < nimMedPrev ? 'Marginene komprimeres.' : 'Marginene utvider seg.')
+      : 'Manglende sammenligningsår.', dN.cls));
+
+  const dR = deltaFmt(roeMed, roeMedPrev, 100, 'pp');
+  cards.push(card('ROE-median (sektor)', pct(roeMed, 1),
+    dR.txt,
+    roeMed != null && roeMed > 0.1 ? 'Sterk lønnsomhet over sektor 10%-terskel.'
+    : roeMed != null ? 'Under 10%-terskel – press på lønnsomhet.' : '', dR.cls));
+
+  const dC = deltaFmt(costMed, costMedPrev);
+  cards.push(card('Cost discipline', pct(costMed),
+    dC.txt.replace('YoY','YoY').replace('+','+').replace('-','−'),
+    costMed != null && costMed < 0.5 ? 'Kostnadsprosenten holder seg under 50%.'
+    : costMed != null ? 'Kostnadsprosenten over 50% – effektivitetspress.' : '',
+    dC.cls === 'td-pos' ? 'td-neg' : dC.cls === 'td-neg' ? 'td-pos' : ''));
+
+  cards.push(card('Capital strength (CET1)', cet1Med != null ? cet1Med.toFixed(1) + '%' : '–',
+    deltaFmt(cet1Med, cet1MedPrev, 100, 'pp').txt,
+    cet1Med != null && cet1Med > 18 ? 'Solid buffer over regulatorisk minimum.' : 'Lavere CET1-buffer.',
+    deltaFmt(cet1Med, cet1MedPrev, 100, 'pp').cls));
+
+  cards.push(card('Deposit funding', pct(depMed, 1),
+    deltaFmt(depMed, depMedPrev, 100, 'pp').txt,
+    depMed != null && depMed > 0.9 ? 'Sterk innskuddsfinansiering – lav markedsfundingavhengighet.'
+    : depMed != null ? 'Moderat innskuddsdekning.' : '',
+    deltaFmt(depMed, depMedPrev, 100, 'pp').cls));
+
+  cards.push(card('Loan growth', pct(lgMed, 1),
+    deltaFmt(lgMed, lgMedPrev, 100, 'pp').txt,
+    lgMed != null && lgMed > 0.05 ? 'Vekst over 5% – ekspansjon.'
+    : lgMed != null && lgMed > 0 ? 'Moderat vekst.'
+    : lgMed != null ? 'Negativ utlånsutvikling.' : '',
+    deltaFmt(lgMed, lgMedPrev, 100, 'pp').cls));
+
+  cards.push(card('Rate sensitivity (sektor)',
+    nimBeta != null ? bp(nimBeta, 1) + ' / pp rente' : '–',
+    '',
+    nimBeta != null && nimBeta > 0 ? `Positiv NIM-beta indikerer økt margin ved heving.` : 'Negativ/uklar sensitivitet.',
+    nimBeta != null && nimBeta > 0 ? 'td-pos' : ''));
+
+  // Breadth: andel banker med fallende NIM siste år
+  const bankPairs = lastRows.map(r => {
+    const p = prevRows.find(pr => pr.bank === r.bank);
+    return p && r.nim != null && p.nim != null ? { bank: r.bank, cur: r.nim, prev: p.nim } : null;
+  }).filter(x => x);
+  const declining = bankPairs.filter(p => p.cur < p.prev).length;
+  const breadthPct = bankPairs.length ? declining / bankPairs.length * 100 : null;
+  cards.push(card('NIM breadth (fallende)',
+    breadthPct != null ? breadthPct.toFixed(0) + '%' : '–',
+    `${declining}/${bankPairs.length} banker`,
+    breadthPct != null && breadthPct > 60 ? 'Bred margin-svekkelse i sektoren.'
+    : breadthPct != null && breadthPct > 40 ? 'Blandet utvikling i sektoren.'
+    : breadthPct != null ? 'Bred margin-styrking i sektoren.' : '',
+    breadthPct != null && breadthPct > 60 ? 'td-neg' : breadthPct != null && breadthPct < 40 ? 'td-pos' : ''));
+
+  document.getElementById('cmd-pulse-cards').innerHTML = cards.join('');
+
+  // Sector trend charts with P25-P75 spread
+  const buildSectorTrace = (metric, color) => {
+    const xs = years, mids = [], lows = [], highs = [];
+    for (const yr of years) {
+      const vs = STATE.banks.filter(r => r.year === yr).map(r => getMetricVal(r, metric))
+        .filter(v => v != null && isFinite(v)).sort((a,b)=>a-b);
+      if (!vs.length) { mids.push(null); lows.push(null); highs.push(null); continue; }
+      const m = vs[Math.floor(vs.length/2)];
+      const p25 = vs[Math.floor(vs.length*0.25)];
+      const p75 = vs[Math.floor(vs.length*0.75)];
+      mids.push(m*100); lows.push(p25*100); highs.push(p75*100);
+    }
+    return [
+      { x: xs, y: highs, name: 'P75', type:'scatter', mode:'lines', line:{color:color,width:0}, showlegend:false },
+      { x: xs, y: lows, name: 'P25–P75 spread', type:'scatter', mode:'lines', line:{color:color,width:0}, fill:'tonexty', fillcolor:color.replace('rgb','rgba').replace(')',',0.13)') },
+      { x: xs, y: mids, name: 'Median', type:'scatter', mode:'lines+markers', line:{color:color,width:2.5}, marker:{size:5}, connectgaps:false },
+    ];
+  };
+
+  Plotly.newPlot('chart-cmd-nim', buildSectorTrace('nim', 'rgb(59,130,246)'), {
+    ...PLOTLY_LAYOUT(), yaxis: { ticksuffix:'%', title:'NIM (%)' }, showlegend:true,
+    legend:{font:{size:10}, orientation:'h', y:-0.18}
+  }, PLOTLY_CONFIG);
+
+  Plotly.newPlot('chart-cmd-roe', buildSectorTrace('roe', 'rgb(139,92,246)'), {
+    ...PLOTLY_LAYOUT(), yaxis: { ticksuffix:'%', title:'ROE (%)' }, showlegend:true,
+    legend:{font:{size:10}, orientation:'h', y:-0.18}
+  }, PLOTLY_CONFIG);
+
+  // Breadth chart - share of banks with declining NIM each year
+  const breadthSeries = [];
+  for (let i = 1; i < years.length; i++) {
+    const yr = years[i], pyr = years[i-1];
+    if (pyr !== yr-1) { breadthSeries.push(null); continue; }
+    const cur = STATE.banks.filter(r => r.year === yr);
+    const prev = STATE.banks.filter(r => r.year === pyr);
+    const matched = cur.map(r => {
+      const p = prev.find(pp => pp.bank === r.bank);
+      return p && r.nim != null && p.nim != null ? { c: r.nim, p: p.nim } : null;
+    }).filter(x => x);
+    if (!matched.length) { breadthSeries.push(null); continue; }
+    breadthSeries.push(matched.filter(m => m.c < m.p).length / matched.length * 100);
+  }
+
+  Plotly.newPlot('chart-cmd-breadth', [{
+    x: years.slice(1), y: breadthSeries, type:'bar',
+    marker: { color: breadthSeries.map(v => v == null ? '#64748b' : v > 60 ? '#ef4444' : v < 40 ? '#10b981' : '#f59e0b'), opacity:0.85 },
+    text: breadthSeries.map(v => v != null ? v.toFixed(0) + '%' : ''),
+    textposition: 'outside', textfont: { size: 10, color: '#94a3b8' },
+    hovertemplate: 'År %{x}<br>%{y:.0f}% av banker hadde fallende NIM YoY<extra></extra>',
+  }, {
+    x: [years[1], years[years.length-1]], y: [50, 50],
+    type: 'scatter', mode: 'lines', line: { color: 'rgba(100,116,139,0.4)', dash:'dot', width: 1 },
+    name: '50% threshold', showlegend: false
+  }], {
+    ...PLOTLY_LAYOUT(),
+    yaxis: { title: 'Andel banker (%)', ticksuffix: '%', range: [0, 105] },
+  }, PLOTLY_CONFIG);
+
+  // Movers chart
+  const movers = bankPairs.map(p => ({ bank: p.bank, delta: (p.cur - p.prev) * 10000 }))
+    .filter(m => isFinite(m.delta))
+    .sort((a,b) => b.delta - a.delta);
+  const topMovers = [...movers.slice(0, 8), ...movers.slice(-8).reverse()];
+
+  Plotly.newPlot('chart-cmd-movers', [{
+    y: topMovers.map(m => m.bank.replace(/\s*(Sparebank(en)?)\s*/gi, ' Sb').trim().substring(0, 22)),
+    x: topMovers.map(m => m.delta),
+    type: 'bar', orientation: 'h',
+    marker: { color: topMovers.map(m => m.delta >= 0 ? 'rgba(16,185,129,0.85)' : 'rgba(239,68,68,0.85)') },
+    hovertemplate: '<b>%{y}</b><br>Δ NIM: %{x:.0f} bp<extra></extra>',
+    text: topMovers.map(m => (m.delta>=0?'+':'') + m.delta.toFixed(0) + 'bp'),
+    textposition: 'auto', textfont: { size: 9, color: '#0a0e1a' }
+  }], {
+    ...PLOTLY_LAYOUT(),
+    margin: { l: 175, r: 20, t: 20, b: 40 },
+    xaxis: { title: `Δ NIM ${prevYr}→${lastYr} (bp)`, zeroline:true, zerolinecolor:'rgba(100,116,139,0.4)' },
+    yaxis: { autorange: 'reversed', tickfont: { size: 9 } },
+  }, PLOTLY_CONFIG);
+
+  // Insights
+  renderCommandInsights(lastYr, prevYr, nimMed, nimMedPrev, roeMed, roeMedPrev, breadthPct, movers, nimBeta);
+}
+
+function renderCommandInsights(lastYr, prevYr, nimMed, nimMedPrev, roeMed, roeMedPrev, breadthPct, movers, nimBeta) {
+  const insights = [];
+
+  if (nimMed != null && nimMedPrev != null) {
+    const diff = (nimMed - nimMedPrev) * 10000;
+    insights.push(`Sektor-median NIM endret ${diff>=0?'+':''}${diff.toFixed(0)} basispunkter fra ${prevYr} (${pct(nimMedPrev)}) til ${lastYr} (${pct(nimMed)}).`);
+  }
+
+  if (breadthPct != null) {
+    const sentiment = breadthPct > 60 ? 'tilsier bredt marginpress' :
+                     breadthPct > 50 ? 'tilsier moderat marginpress' :
+                     breadthPct > 40 ? 'er balansert' : 'tilsier bredt marginløft';
+    insights.push(`<b>${breadthPct.toFixed(0)}%</b> av bankene rapporterte fallende NIM YoY, hvilket ${sentiment}.`);
+  }
+
+  if (movers && movers.length >= 2) {
+    const top = movers[0], bot = movers[movers.length-1];
+    if (top.delta > 0) insights.push(`Største NIM-løft: <b>${top.bank}</b> (+${top.delta.toFixed(0)} bp).`);
+    if (bot.delta < 0) insights.push(`Største NIM-fall: <b>${bot.bank}</b> (${bot.delta.toFixed(0)} bp).`);
+  }
+
+  if (roeMed != null && roeMedPrev != null) {
+    const diff = (roeMed - roeMedPrev) * 100;
+    insights.push(`Sektor-median ROE: ${pct(roeMed,1)} (${diff>=0?'+':''}${diff.toFixed(1)} pp YoY).`);
+  }
+
+  // High ROE share
+  const lastRows = STATE.banks.filter(r => r.year === lastYr && r.roe != null);
+  const highRoe = lastRows.filter(r => r.roe > 0.1).length;
+  if (lastRows.length) insights.push(`<b>${highRoe}/${lastRows.length}</b> banker hadde ROE over 10% i ${lastYr}.`);
+
+  // CET1 banks with very high
+  const cet1Rows = STATE.banks.filter(r => r.year === lastYr && r.cet1 != null);
+  if (cet1Rows.length) {
+    const wellCap = cet1Rows.filter(r => r.cet1 > 20).length;
+    insights.push(`<b>${wellCap}/${cet1Rows.length}</b> banker har CET1 over 20% – betydelig kapitalbuffer.`);
+  }
+
+  if (nimBeta != null) {
+    insights.push(`Estimert sektor NIM-beta mot styringsrenten: <b>${(nimBeta*100).toFixed(2)} bp per 100 bp rente</b> – tolkes som historisk samvariasjon, ikke kausalitet.`);
+  }
+
+  document.getElementById('cmd-insights').innerHTML = insights.map(t => `<div class="commentary">${t}</div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RENTEEKSPONERING / RATE SENSITIVITY
+// ═══════════════════════════════════════════════════════════════════════════
+function initRateExposure() {
+  document.getElementById('run-rate').addEventListener('click', runRateExposure);
+  document.getElementById('rate-export').addEventListener('click', () => {
+    const tbl = document.querySelector('#rate-table table');
+    if (tbl) exportTableToExcel(tbl, 'norbank_rate_exposure');
+  });
+}
+
+function computeBetaForBank(bank, metric, minObs) {
+  const records = STATE.banks.filter(r => r.bank === bank && r.policy_rate != null && getMetricVal(r, metric) != null);
+  if (records.length < minObs) return null;
+  const xs = records.map(r => r.policy_rate);
+  const ys = records.map(r => getMetricVal(r, metric));
+  const n = xs.length;
+  const xb = xs.reduce((a,b)=>a+b,0)/n;
+  const yb = ys.reduce((a,b)=>a+b,0)/n;
+  const Sxx = xs.reduce((s,x)=>s+(x-xb)**2,0);
+  const Sxy = xs.reduce((s,x,i)=>s+(x-xb)*(ys[i]-yb),0);
+  if (Sxx === 0) return null;
+  const beta = Sxy/Sxx;
+  const alpha = yb - beta*xb;
+  const fitted = xs.map(x => alpha + beta*x);
+  const SSres = ys.reduce((s,y,i)=>s+(y-fitted[i])**2, 0);
+  const SStot = ys.reduce((s,y)=>s+(y-yb)**2, 0);
+  const r2 = SStot ? 1 - SSres/SStot : 0;
+  return { beta, alpha, r2, n, segment: records[0].segment };
+}
+
+function runRateExposure() {
+  const metric = document.getElementById('rate-metric').value;
+  const segFilter = document.getElementById('rate-segment').value;
+  const minObs = parseInt(document.getElementById('rate-minobs').value);
+
+  const banks = allBanks();
+  const results = banks.map(b => {
+    const r = computeBetaForBank(b, metric, minObs);
+    return r ? { bank: b, ...r } : null;
+  }).filter(x => x && (segFilter === 'all' || x.segment === segFilter));
+
+  if (!results.length) {
+    document.getElementById('rate-table').innerHTML = '<div class="empty">Ingen banker har tilstrekkelig data</div>';
+    return;
+  }
+
+  results.sort((a,b) => b.beta - a.beta);
+
+  // KPIs
+  const betas = results.map(r => r.beta);
+  const medBeta = betas.slice().sort((a,b)=>a-b)[Math.floor(betas.length/2)];
+  const avgBeta = betas.reduce((a,b)=>a+b,0)/betas.length;
+  const posCount = betas.filter(b => b > 0).length;
+  const negCount = betas.filter(b => b < 0).length;
+
+  const metricUnit = { nim:'bp', roe:'bp', cost_ratio:'bp', loss_rate:'bp' }[metric] || 'bp';
+  const scale = 10000;
+
+  document.getElementById('rate-kpis').innerHTML = [
+    { label: 'Banker analysert', val: results.length, sub: `Min. ${minObs} observasjoner` },
+    { label: 'Median beta', val: (medBeta*scale).toFixed(1) + ' ' + metricUnit + ' / pp rente', sub: 'Sentral tendens' },
+    { label: 'Gjennomsnittlig beta', val: (avgBeta*scale).toFixed(1) + ' ' + metricUnit + ' / pp rente', sub: '' },
+    { label: 'Positiv / negativ beta', val: `${posCount} / ${negCount}`, sub: `${(posCount/results.length*100).toFixed(0)}% positive` },
+  ].map(k => `<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-delta">${k.sub}</div></div>`).join('');
+
+  // Top positive
+  const topPos = results.slice(0, 15);
+  Plotly.newPlot('chart-rate-pos', [{
+    y: topPos.map(r => r.bank.replace(/\s*(Sparebank(en)?)\s*/gi,' Sb').trim().substring(0,22)),
+    x: topPos.map(r => r.beta*scale),
+    type: 'bar', orientation: 'h',
+    marker: { color: topPos.map(r => `rgba(16,185,129,${0.4 + r.r2*0.55})`) },
+    hovertemplate: '<b>%{y}</b><br>β: %{x:.1f} bp/pp<br>R²: %{customdata:.2f}<extra></extra>',
+    customdata: topPos.map(r => r.r2),
+    text: topPos.map(r => (r.beta*scale).toFixed(0)),
+    textposition: 'auto', textfont:{size:9,color:'#0a0e1a'}
+  }], {
+    ...PLOTLY_LAYOUT(),
+    margin: { l: 180, r: 20, t: 20, b: 40 },
+    xaxis: { title: `β (${metricUnit}/pp rente)`, zeroline:true },
+    yaxis: { autorange: 'reversed', tickfont:{size:9} },
+  }, PLOTLY_CONFIG);
+
+  const topNeg = results.slice(-15).reverse();
+  Plotly.newPlot('chart-rate-neg', [{
+    y: topNeg.map(r => r.bank.replace(/\s*(Sparebank(en)?)\s*/gi,' Sb').trim().substring(0,22)),
+    x: topNeg.map(r => r.beta*scale),
+    type: 'bar', orientation: 'h',
+    marker: { color: topNeg.map(r => `rgba(239,68,68,${0.4 + r.r2*0.55})`) },
+    hovertemplate: '<b>%{y}</b><br>β: %{x:.1f} bp/pp<br>R²: %{customdata:.2f}<extra></extra>',
+    customdata: topNeg.map(r => r.r2),
+    text: topNeg.map(r => (r.beta*scale).toFixed(0)),
+    textposition: 'auto', textfont:{size:9,color:'#0a0e1a'}
+  }], {
+    ...PLOTLY_LAYOUT(),
+    margin: { l: 180, r: 20, t: 20, b: 40 },
+    xaxis: { title: `β (${metricUnit}/pp rente)`, zeroline:true },
+    yaxis: { autorange: 'reversed', tickfont:{size:9} },
+  }, PLOTLY_CONFIG);
+
+  // Histogram
+  Plotly.newPlot('chart-rate-hist', [{
+    x: results.map(r => r.beta*scale),
+    type: 'histogram', nbinsx: 25,
+    marker: { color: 'rgba(59,130,246,0.6)', line:{color:'#3b82f6',width:1} },
+  }, {
+    x: [medBeta*scale, medBeta*scale], y: [0, results.length/3],
+    mode:'lines', line:{color:'#f59e0b',width:2,dash:'dash'}, name:'Median'
+  }], {
+    ...PLOTLY_LAYOUT(),
+    xaxis: { title: `β-fordeling (${metricUnit}/pp rente)`, zeroline:true },
+    yaxis: { title: 'Antall banker' },
+  }, PLOTLY_CONFIG);
+
+  // Segment comparison
+  const segMeds = {};
+  ['small','medium','large'].forEach(s => {
+    const segBetas = results.filter(r => r.segment === s).map(r => r.beta);
+    if (segBetas.length) {
+      segBetas.sort((a,b)=>a-b);
+      segMeds[s] = segBetas[Math.floor(segBetas.length/2)];
+    }
+  });
+  const segLabels = { small:'Små', medium:'Mellomstore', large:'Store' };
+  Plotly.newPlot('chart-rate-seg', [{
+    x: Object.keys(segMeds).map(s => segLabels[s]),
+    y: Object.values(segMeds).map(v => v*scale),
+    type: 'bar',
+    marker: { color: Object.values(segMeds).map(v => v >= 0 ? '#10b981' : '#ef4444'), opacity: 0.85 },
+    text: Object.values(segMeds).map(v => (v*scale).toFixed(1) + ' bp'),
+    textposition: 'outside', textfont: { color:'#94a3b8', size:11 }
+  }], {
+    ...PLOTLY_LAYOUT(),
+    yaxis: { title: `Median β (${metricUnit}/pp rente)`, zeroline:true },
+  }, PLOTLY_CONFIG);
+
+  // Table
+  const tblRows = results.map((r, i) => `<tr>
+    <td class="td-rank">#${i+1}</td>
+    <td style="text-align:left">${r.bank}</td>
+    <td>${r.segment === 'large' ? 'Stor' : r.segment === 'medium' ? 'Medium' : 'Liten'}</td>
+    <td class="${r.beta>0?'td-pos':'td-neg'}" style="font-family:var(--mono)">${(r.beta*scale).toFixed(1)}</td>
+    <td>${r.r2.toFixed(3)}</td>
+    <td>${r.n}</td>
+  </tr>`).join('');
+  document.getElementById('rate-table').innerHTML = `
+    <table class="analytics-tbl">
+      <thead><tr><th>Rank</th><th style="text-align:left">Bank</th><th>Segment</th>
+        <th>β (${metricUnit}/pp)</th><th>R²</th><th>n</th></tr></thead>
+      <tbody>${tblRows}</tbody>
+    </table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA QUALITY
+// ═══════════════════════════════════════════════════════════════════════════
+function renderDataQuality() {
+  const years = allYears();
+  const banks = allBanks();
+  const records = STATE.allBanks; // Bruk hele datasettet, ikke filtrert
+
+  // KPIs
+  const totalObs = records.length;
+  const dateRange = years.length ? `${years[0]}–${years[years.length-1]}` : '–';
+
+  const metrics = ['nim','roe','cost_ratio','cet1','deposit_coverage','loan_growth','loss_rate','total_assets','equity','gross_loans','deposits','policy_rate'];
+  const coverage = metrics.map(m => {
+    const filled = records.filter(r => getMetricVal(r,m) != null).length;
+    return { metric: m, pct: filled/records.length, n: filled };
+  });
+
+  document.getElementById('dq-kpis').innerHTML = [
+    { label: 'Totale observasjoner', val: totalObs.toLocaleString('nb-NO'), sub: `${banks.length} unike banker` },
+    { label: 'Periode', val: dateRange, sub: `${years.length} år` },
+    { label: 'Univers (aktivt)', val: STATE.universe === 'sparebanker' ? 'Sparebanker' : 'Alle banker', sub: `${STATE.banks.length.toLocaleString('nb-NO')} obs.` },
+    { label: 'Gjennomsnittlig metric-dekning', val: (coverage.reduce((s,c)=>s+c.pct,0)/coverage.length*100).toFixed(1)+'%', sub: `${metrics.length} nøkkeltall sjekket` },
+  ].map(k => `<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.val}</div><div class="kpi-delta">${k.sub}</div></div>`).join('');
+
+  // Coverage heatmap: rows=metrics, cols=years
+  const metricLabels = { nim:'NIM', roe:'ROE', cost_ratio:'Kostnad%', cet1:'CET1',
+    deposit_coverage:'Innsk.dekn', loan_growth:'Utl.vekst', loss_rate:'Tapsprosent',
+    total_assets:'FK', equity:'Egenkapital', gross_loans:'Brutto utlån', deposits:'Innskudd', policy_rate:'Styringsrente' };
+  const z = [], texts = [];
+  metrics.forEach(m => {
+    const row = [], rowt = [];
+    years.forEach(yr => {
+      const yrRows = records.filter(r => r.year === yr);
+      const filled = yrRows.filter(r => getMetricVal(r,m) != null).length;
+      const p = yrRows.length ? filled/yrRows.length*100 : 0;
+      row.push(p);
+      rowt.push(`${filled}/${yrRows.length}`);
+    });
+    z.push(row); texts.push(rowt);
+  });
+
+  Plotly.newPlot('chart-dq-coverage', [{
+    z: z, x: years, y: metrics.map(m => metricLabels[m]),
+    type: 'heatmap',
+    colorscale: [[0,'#1f2937'],[0.5,'#f59e0b'],[1,'#10b981']],
+    text: texts, hoverinfo: 'x+y+text+z',
+    hovertemplate: '<b>%{y}</b><br>År: %{x}<br>Dekning: %{z:.0f}%<br>%{text} banker<extra></extra>',
+    showscale: true, colorbar: { title:{text:'%',font:{color:'#94a3b8',size:10}}, thickness:10, len:0.7 }
+  }], {
+    ...PLOTLY_LAYOUT(),
+    margin: { l: 90, r: 60, t: 10, b: 40 },
+    xaxis: { side:'bottom', tickfont:{size:10} },
+    yaxis: { tickfont:{size:11}, autorange:'reversed' },
+  }, PLOTLY_CONFIG);
+
+  // Banks per year bar chart
+  const banksPerYear = years.map(yr => records.filter(r => r.year === yr).length);
+  Plotly.newPlot('chart-dq-banks', [{
+    x: years, y: banksPerYear, type: 'bar',
+    marker: { color: '#3b82f6', opacity:0.85 },
+    text: banksPerYear, textposition:'outside', textfont:{size:10,color:'#94a3b8'},
+    hovertemplate: 'År %{x}<br>%{y} banker<extra></extra>'
+  }], {
+    ...PLOTLY_LAYOUT(),
+    yaxis: { title: 'Antall banker' },
+  }, PLOTLY_CONFIG);
+
+  // Incomplete banks table - banks with missing core metrics in latest year
+  const lastYr = years[years.length-1];
+  const lastRows = records.filter(r => r.year === lastYr);
+  const coreMetrics = ['nim','roe','cost_ratio','cet1','deposit_coverage','total_assets'];
+  const incomplete = lastRows.map(r => {
+    const missing = coreMetrics.filter(m => getMetricVal(r,m) == null);
+    return { bank: r.bank, missing: missing.map(m => metricLabels[m] || m), count: missing.length };
+  }).filter(r => r.count > 0).sort((a,b) => b.count - a.count);
+
+  if (incomplete.length === 0) {
+    document.getElementById('dq-incomplete').innerHTML =
+      `<div style="padding:20px;text-align:center;color:var(--green);font-size:12px">✓ Alle banker i ${lastYr} har komplette kjernemetrikker</div>`;
+  } else {
+    const rows = incomplete.slice(0, 50).map(r => `<tr>
+      <td style="text-align:left">${r.bank}</td>
+      <td>${r.count}</td>
+      <td style="text-align:left;color:var(--text2);font-size:11px">${r.missing.join(', ')}</td>
+    </tr>`).join('');
+    document.getElementById('dq-incomplete').innerHTML = `
+      <table class="analytics-tbl">
+        <thead><tr><th style="text-align:left">Bank (${lastYr})</th>
+          <th>Antall manglende</th><th style="text-align:left">Manglende metrikker</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
 }
 
 init();
