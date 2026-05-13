@@ -2,7 +2,7 @@
 
 Bloomberg-inspirert analyseverktøy for norske sparebanker – 164 banker, 2015–2025, 6 analytiske moduler.
 
-**Live demo:** `https://[ditt-brukernavn].github.io/bankanalyse/`
+
 
 ---
 
